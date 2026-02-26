@@ -1,5 +1,8 @@
 # 📅 Modern DatePicker (JS, HTML, CSS)
 
+## Proje Görünümü
+![Modern Datepicker Tasarımı](screenshot.png)
+
 Bu proje, harici kütüphane (jQuery vb.) kullanmadan, saf JavaScript (**Vanilla JS**), HTML5 ve CSS3 kullanılarak geliştirilmiş, modern ve kullanıcı dostu bir tarih seçici (datepicker) arayüzüdür.
 
 
@@ -23,8 +26,5 @@ Takvim yapısı, JS tarafındaki `Date()` objesiyle şu mantıkla çalışır:
 - Ayın toplam gün sayısı hesaplanır.
 - Döngü ile ızgara (grid) içine DOM elemanları yerleştirilir.
   
-## Proje Görünümü
-![Modern Datepicker Tasarımı](screenshot.png)
-
 ---
 Geliştiren: [Mehmet Aydın]
