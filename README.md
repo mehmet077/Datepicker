@@ -23,5 +23,8 @@ Takvim yapısı, JS tarafındaki `Date()` objesiyle şu mantıkla çalışır:
 - Ayın toplam gün sayısı hesaplanır.
 - Döngü ile ızgara (grid) içine DOM elemanları yerleştirilir.
   
+## Proje Görünümü
+![Modern Datepicker Tasarımı](screenshot.png)
+
 ---
 Geliştiren: [Mehmet Aydın]
