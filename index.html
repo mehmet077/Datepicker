@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Datepicker - Onay Butonlu</title>
+    <style>
+        /* Önceki düzeltmeleri de içeren CSS */
+        * {
+            box-sizing: border-box; /* Taşmayı önleyen kritik kural */
+        }
+
+        :root {
+            --primary: #4a90e2;
+            --primary-hover: #357abd;
+            --bg: #f4f7f6;
+            --card-bg: #ffffff;
+            --text: #333;
+            --light-gray: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .datepicker-container {
+            background: var(--card-bg);
+            width: 320px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 20px;
+            user-select: none;
+        }
+
+        #selectedDateDisplay {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
+            font-size: 1rem;
+            text-align: center;
+            outline: none;
+            color: var(--primary);
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .datepicker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .datepicker-header h2 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--text);
+        }
+
+        .nav-btn {
+            background: none;
+            border: 1px solid var(--light-gray);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+        }
+
+        .day-name {
+            font-weight: bold;
+            font-size: 0.7rem;
+            color: #999;
+            text-align: center;
+            padding-bottom: 8px;
+        }
+
+        .day {
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+
+        .day:hover:not(.empty) {
+            background-color: #f0f7ff;
+        }
+
+        .day.today {
+            color: var(--primary);
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        .day.selected {
+            background-color: var(--primary) !important;
+            color: white !important;
+        }
+
+        .day.empty { cursor: default; }
+
+        /* YENİ EKLENEN BUTON STİLİ */
+        .confirm-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .confirm-btn:hover {
+            background-color: var(--primary-hover);
+        }
+    </style>
+</head>
+<body>
+
+<div class="datepicker-container">
+    <input type="text" id="selectedDateDisplay" placeholder="Tarih seçiniz..." readonly>
+
+    <div class="datepicker-header">
+        <button class="nav-btn" id="prevBtn">&lt;</button>
+        <h2 id="monthYear"></h2>
+        <button class="nav-btn" id="nextBtn">&gt;</button>
+    </div>
+
+    <div class="calendar-grid">
+        <div class="day-name">Pz</div><div class="day-name">Sa</div><div class="day-name">Çr</div>
+        <div class="day-name">Pr</div><div class="day-name">Cu</div><div class="day-name">Ct</div>
+        <div class="day-name">Pa</div>
+    </div>
+
+    <div class="calendar-grid" id="daysContainer"></div>
+
+    <button class="confirm-btn" id="confirmBtn">Tarihi Onayla</button>
+</div>
+
+<script>
+    const monthYearText = document.getElementById('monthYear');
+    const daysContainer = document.getElementById('daysContainer');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const dateInput = document.getElementById('selectedDateDisplay');
+    const confirmBtn = document.getElementById('confirmBtn');
+
+    let currentNavDate = new Date();
+    let selectedDate = null;
+
+    function renderCalendar() {
+        daysContainer.innerHTML = "";
+        const year = currentNavDate.getFullYear();
+        const month = currentNavDate.getMonth();
+
+        monthYearText.innerText = currentNavDate.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
+
+        const firstDayOfMonth = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        for (let i = 0; i < firstDayOfMonth; i++) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.classList.add('day', 'empty');
+            daysContainer.appendChild(emptyDiv);
+        }
+
+        for (let i = 1; i <= daysInMonth; i++) {
+            const dayDiv = document.createElement('div');
+            dayDiv.classList.add('day');
+            dayDiv.innerText = i;
+
+            const today = new Date();
+            if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                dayDiv.classList.add('today');
+            }
+
+            if (selectedDate && i === selectedDate.getDate() && month === selectedDate.getMonth() && year === selectedDate.getFullYear()) {
+                dayDiv.classList.add('selected');
+            }
+
+            dayDiv.addEventListener('click', () => {
+                selectedDate = new Date(year, month, i);
+                dateInput.value = selectedDate.toLocaleDateString('tr-TR');
+                renderCalendar();
+            });
+
+            daysContainer.appendChild(dayDiv);
+        }
+    }
+
+    // ALERT GÖSTEREN FONKSİYON
+    confirmBtn.addEventListener('click', () => {
+        if (selectedDate) {
+            const formattedDate = selectedDate.toLocaleDateString('tr-TR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+            alert("Seçtiğiniz Tarih: " + formattedDate);
+        } else {
+            alert("Lütfen önce bir tarih seçiniz!");
+        }
+    });
+
+    prevBtn.addEventListener('click', () => {
+        currentNavDate.setMonth(currentNavDate.getMonth() - 1);
+        renderCalendar();
+    });
+
+    nextBtn.addEventListener('click', () => {
+        currentNavDate.setMonth(currentNavDate.getMonth() + 1);
+        renderCalendar();
+    });
+
+    renderCalendar();
+</script>
+
+</body>
+</html>
